@@ -55,5 +55,9 @@ Implement a task dependency system that allows tasks to depend on other tasks. T
 Thanks for your time and effort. We'll be in touch soon!
 
 ## Solution
+<img src="screenshots/screenshot-1752778717.png" alt="App screenshot" width="500"/>
+<img src="screenshots/screenshot-1752778745.png" alt="App screenshot" width="500"/>
+<img src="screenshots/screenshot-1752778791.png" alt="App screenshot" width="500"/>
+<img src="screenshots/screenshot-1752778806.png" alt="App screenshot" width="500"/>
+<img src="screenshots/screenshot-1752778833.png" alt="App screenshot" width="500"/>
 
-(/screenshots/screenshot-1752778717.png)
