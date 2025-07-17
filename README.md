@@ -55,9 +55,16 @@ Implement a task dependency system that allows tasks to depend on other tasks. T
 Thanks for your time and effort. We'll be in touch soon!
 
 ## Solution
-<img src="screenshots/screenshot-1752778717.png" alt="App screenshot" width="500"/>
-<img src="screenshots/screenshot-1752778745.png" alt="App screenshot" width="500"/>
-<img src="screenshots/screenshot-1752778791.png" alt="App screenshot" width="500"/>
-<img src="screenshots/screenshot-1752778806.png" alt="App screenshot" width="500"/>
-<img src="screenshots/screenshot-1752778833.png" alt="App screenshot" width="500"/>
+The migration that I made redefines the entire Todo table to add a new column: "dueDate." We temporarily diable foreign key operations for a smooth recreation process. It copies all existing data from the old table to the new one, then renames the new table to "Todo." Finally, we re-enable the foreign key constraints and checking. These updates are found in prisma/migrations/20250717181509_add_completed_to_todo/migration.sql:
+<img src="screenshots/screenshot-1752778717.png" width="500"/>
+Next we implement state management at the top of the home page file for storing the new column value. The input fields are controlled be React state, giving us real-time updates and data persistance. We then update the date input component to save the value to the state. These updates are found in app/page.tsx:
+<img src="screenshots/screenshot-1752779593.png" width="500"/>
+<img src="screenshots/screenshot-1752778791.png" width="500"/>
+Here we are just updating the JSON body to include the dueDate before it is sent to our backend through the HTTP POST request. We also reset the state after. These updates are found in app/page.tsx:
+<img src="screenshots/screenshot-1752778833.png" width="500"/>
+Next, we update the Next.js route handler that processes requests to create new todos. I updated it to extract dueDate form the JSON, and convert dueDate to ISO for the db schema before updating the db. These updates are found in app/api/todos/route.ts:
+<img src="screenshots/screenshot-1752778745.png" width="500"/>
+Finally, the date needs to be displayed! I updated the display to return a processed date from the db so that it is readable. It then checks with the current date, ensuring time of day does not interfere with normalization. Finally it is displayed with dynamic styling to determine if the Todo is to be late! Displaying the ISO string sliced to show down to the day!
+<img src="screenshots/screenshot-1752778806.png" width="500"/>
+
 
