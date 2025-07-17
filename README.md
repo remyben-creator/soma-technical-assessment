@@ -56,4 +56,4 @@ Thanks for your time and effort. We'll be in touch soon!
 
 ## Solution
 
-(/home/archben/soma-technical-assessment)/screenshots/screenshot-1752778717.png)
+(/screenshots/screenshot-1752778717.png)
