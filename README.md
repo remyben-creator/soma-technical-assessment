@@ -64,7 +64,7 @@ Here we are just updating the JSON body to include the dueDate before it is sent
 <img src="screenshots/screenshot-1752778833.png" width="500"/>
 Next, we update the Next.js route handler that processes requests to create new todos. I updated it to extract dueDate form the JSON, and convert dueDate to ISO for the db schema before updating the db. These updates are found in app/api/todos/route.ts:
 <img src="screenshots/screenshot-1752778745.png" width="500"/>
-Finally, the date needs to be displayed! I updated the display to return a processed date from the db so that it is readable. It then checks with the current date, ensuring time of day does not interfere with normalization. Finally it is displayed with dynamic styling to determine if the Todo is to be late! Displaying the ISO string sliced to show down to the day!
+Finally, the date needs to be displayed! I updated the display to return a processed date from the db so that it is readable. It then checks with the current date, ensuring time of day does not interfere with normalization. Finally it is displayed with dynamic styling to determine if the Todo is to be late! Displaying the ISO string sliced to show down to the day! These updates can be found in app/page.tsx:
 <img src="screenshots/screenshot-1752778806.png" width="500"/>
 
 
