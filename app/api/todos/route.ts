@@ -16,17 +16,30 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { title } = await request.json();
+    const body = await request.json();
+    console.log('Received body:', body);
+    const { title, dueDate } = body;
     if (!title || title.trim() === '') {
       return NextResponse.json({ error: 'Title is required' }, { status: 400 });
     }
+    const data: any = { title };
+    if (dueDate && dueDate.trim() !== "") {
+      // If dueDate is in YYYY-MM-DD format, convert to ISO-8601
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dueDate)) {
+        data.dueDate = new Date(dueDate).toISOString();
+      } else {
+        data.dueDate = dueDate;
+      }
+    } else {
+      data.dueDate = null;
+    }
     const todo = await prisma.todo.create({
-      data: {
-        title,
-      },
+      data,
     });
     return NextResponse.json(todo, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: 'Error creating todo' }, { status: 500 });
+    console.error('Error in POST /api/todos:', error);
+    const message = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ error: 'Error creating todo', details: message }, { status: 500 });
   }
 }
