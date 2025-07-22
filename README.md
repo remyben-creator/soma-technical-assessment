@@ -55,7 +55,7 @@ Implement a task dependency system that allows tasks to depend on other tasks. T
 Thanks for your time and effort. We'll be in touch soon!
 
 ## Solution
-The migration that I made redefines the entire Todo table to add a new column: "dueDate." We temporarily diable foreign key operations for a smooth recreation process. It copies all existing data from the old table to the new one, then renames the new table to "Todo." Finally, we re-enable the foreign key constraints and checking. These updates are found in prisma/migrations/20250717181509_add_completed_to_todo/migration.sql:
+The migration that I made redefines the entire Todo table to add a new column: "dueDate." What we did is add the column to schema.prism and then apply the migrations. The migration temporarily diables foreign key operations for a smooth recreation process. It copies all existing data from the old table to the new one, then renames the new table to "Todo." Finally, we re-enable the foreign key constraints and checking. These updates are found in prisma/migrations/20250717181509_add_completed_to_todo/migration.sql:
 <img src="screenshots/screenshot-1752778717.png" width="500"/>
 Next we implement state management at the top of the home page file for storing the new column value. The input fields are controlled be React state, giving us real-time updates and data persistance. We then update the date input component to save the value to the state. These updates are found in app/page.tsx:
 <img src="screenshots/screenshot-1752779593.png" width="500"/>

@@ -33,6 +33,25 @@ export async function POST(request: Request) {
     } else {
       data.dueDate = null;
     }
+
+    // Fetch image from Pexels API proxy
+    let imageURL = null;
+    try {
+      const imageRes = await fetch(`${request.url}/pexels`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: title }),
+      });
+      if (imageRes.ok) {
+        const imageData = await imageRes.json();
+        imageURL = imageData.imageUrl || null;
+        console.log(imageURL)
+      }
+    } catch (e) {
+      console.error('Failed to fetch image from Pexels:', e);
+    }
+    data.imageURL = imageURL;
+
     const todo = await prisma.todo.create({
       data,
     });

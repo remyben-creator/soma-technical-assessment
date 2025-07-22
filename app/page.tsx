@@ -1,6 +1,102 @@
 "use client"
-import { Todo } from '@prisma/client';
 import { useState, useEffect } from 'react';
+
+type Todo = {
+  id: number;
+  title: string;
+  createdAt: Date | string;
+  dueDate?: Date | string | null;
+  imageURL?: string | null;
+  // Add other fields as needed
+};
+
+function TodoItem({ todo, onDelete }: { todo: Todo; onDelete: (id: number) => void }) {
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [imgError, setImgError] = useState(false);
+
+  // Log imageUrl and state for debugging
+  useEffect(() => {
+    console.log('Rendering TodoItem:', { title: todo.title, imageUrl: todo.imageURL });
+  }, [todo.title, todo.imageURL]);
+
+  useEffect(() => {
+    setImgLoaded(false);
+    setImgError(false);
+  }, [todo.imageURL]);
+
+  useEffect(() => {
+    if (imgError) {
+      console.error('Image failed to load for todo:', todo.title, todo.imageURL);
+    }
+    if (imgLoaded) {
+      console.log('Image loaded for todo:', todo.title, todo.imageURL);
+    }
+  }, [imgLoaded, imgError, todo.title, todo.imageURL]);
+
+  return (
+    <li
+      className="flex justify-between items-center bg-white bg-opacity-90 p-4 mb-4 rounded-lg shadow-lg"
+    >
+      <div className="flex items-center">
+        {/* Image Section */}
+        <div className="relative w-20 h-20 mr-4 flex items-center justify-center bg-gray-100 rounded overflow-hidden">
+          {todo.imageURL && !imgError ? (
+            <>
+              <img
+                src={todo.imageURL}
+                alt={todo.title}
+                className={`w-full h-full object-cover ${imgLoaded ? '' : 'invisible'}`}
+                onLoad={() => setImgLoaded(true)}
+                onError={() => setImgError(true)}
+              />
+              {!imgLoaded && (
+                <div className="absolute w-8 h-8 border-4 border-gray-300 border-t-indigo-500 rounded-full animate-spin" />
+              )}
+            </>
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+              No Image
+            </div>
+          )}
+        </div>
+        <span className="text-gray-800">
+          {todo.title}
+          {todo.dueDate && (() => {
+            const due = new Date(todo.dueDate as string);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            due.setHours(0, 0, 0, 0);
+            const isPast = due < today;
+            return (
+              <span className={`ml-4 text-sm ${isPast ? 'text-red-500' : 'text-gray-500'}`}>
+                Due: {due.toISOString().slice(0, 10)}
+              </span>
+            );
+          })()}
+        </span>
+      </div>
+      <button
+        onClick={() => onDelete(todo.id)}
+        className="text-red-500 hover:text-red-700 transition duration-300"
+      >
+        {/* Delete Icon */}
+        <svg
+          className="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    </li>
+  );
+}
 
 export default function Home() {
   const [newTodo, setNewTodo] = useState('');
@@ -77,46 +173,7 @@ export default function Home() {
         </div>
         <ul>
           {todos.map((todo: Todo) => (
-            <li
-              key={todo.id}
-              className="flex justify-between items-center bg-white bg-opacity-90 p-4 mb-4 rounded-lg shadow-lg"
-            >
-              <span className="text-gray-800">
-                {todo.title}
-                {todo.dueDate && (() => {
-                  const due = new Date(todo.dueDate);
-                  const today = new Date();
-                  // Set time to 00:00:00 for comparison
-                  today.setHours(0, 0, 0, 0);
-                  due.setHours(0, 0, 0, 0);
-                  const isPast = due < today;
-                  return (
-                    <span className={`ml-4 text-sm ${isPast ? 'text-red-500' : 'text-gray-500'}`}>
-                      Due: {due.toISOString().slice(0, 10)}
-                    </span>
-                  );
-                })()}
-              </span>
-              <button
-                onClick={() => handleDeleteTodo(todo.id)}
-                className="text-red-500 hover:text-red-700 transition duration-300"
-              >
-                {/* Delete Icon */}
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </li>
+            <TodoItem key={todo.id} todo={todo} onDelete={handleDeleteTodo} />
           ))}
         </ul>
       </div>
