@@ -86,35 +86,6 @@ When writing the next steps for the dependencies in their route.ts file I had to
 Next I needed to show the critical path and calculate the earliest start date. I make a new route.ts file for this. I start by defining the TypeScript types for safety and clarity in the code. I then built a function that constructs an in memory graph representation of all tasks and their dependencies where each node contains the todo, a list of dependencies, and a list of dependantss. I then use Kahn's algorithm to perform a topological sort of the nodes(tasks) in the dependency graph, this ensures tasks are processed in dependancy order. Then for each task I calculate the longest path from any root to the task. I track these results in a Map for efficient lookup, mapping task IDs to the earliest start dates and then find the critical path. Finally, a GET handler is added to build the dependency graph and perform the sort, then it returns a JSON response containing the criticalPath and earliestStartDates. These changes can be found in api/[id]/critical-path/route.ts
 *insert images 4 6 7 here*
 
-6. Visualize the Dependency Graph
-Frontend:
-Use a graph visualization library (e.g., react-flow, Cytoscape.js, or Mermaid.js).
-Show tasks as nodes, dependencies as arrows.
-Highlight the critical path.
-7. UI Changes
-Allow users to:
-Add/remove dependencies when creating or editing a task.
-View dependencies and dependents for each task.
-See the dependency graph and critical path.
-8. Migration
-Update your database schema and migrate existing data.
-Summary Table
-Step	What to Do
-1	Update Prisma schema for self-referencing dependencies
-2	Add API endpoints for managing dependencies
-3	Implement cycle detection logic in backend
-4	Implement critical path calculation (backend or frontend)
-5	Calculate earliest start dates for each task
-6	Add graph visualization to frontend
-7	Update UI for dependency management and visualization
-8	Migrate database and test
-Would you like a detailed plan or code examples for any of these steps?
-For example, I can:
-Write the Prisma schema update
-Show how to check for cycles
-Suggest a graph visualization approach
-Or help with any specific part you want to tackle first!
-
 
 ### Application screenshots
 <img src="screenshots/screenshot-1753291624.png" width="1000"/>
