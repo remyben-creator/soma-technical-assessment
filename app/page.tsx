@@ -14,44 +14,51 @@ function TodoItem({ todo, onDelete }: { todo: Todo; onDelete: (id: number) => vo
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
 
-  // Log imageUrl and state for debugging
   useEffect(() => {
-    console.log('Rendering TodoItem:', { title: todo.title, imageUrl: todo.imageURL });
-  }, [todo.title, todo.imageURL]);
+    // Create a new Image object to handle loading
+    if (!todo.imageURL) {
+      setImgError(true);
+      return;
+    }
 
-  useEffect(() => {
     setImgLoaded(false);
     setImgError(false);
+
+    const img = new window.Image();
+    img.src = todo.imageURL;
+
+    img.onload = () => {
+      setImgLoaded(true);
+    };
+
+    img.onerror = () => {
+      setImgError(true);
+    };
+
+    return () => {
+      img.onload = null;
+      img.onerror = null;
+    };
   }, [todo.imageURL]);
 
-  useEffect(() => {
-    if (imgError) {
-      console.error('Image failed to load for todo:', todo.title, todo.imageURL);
-    }
-    if (imgLoaded) {
-      console.log('Image loaded for todo:', todo.title, todo.imageURL);
-    }
-  }, [imgLoaded, imgError, todo.title, todo.imageURL]);
-
   return (
-    <li
-      className="flex justify-between items-center bg-white bg-opacity-90 p-4 mb-4 rounded-lg shadow-lg"
-    >
+    <li className="flex justify-between items-center bg-white bg-opacity-90 p-4 mb-4 rounded-lg shadow-lg">
       <div className="flex items-center">
-        {/* Image Section */}
         <div className="relative w-20 h-20 mr-4 flex items-center justify-center bg-gray-100 rounded overflow-hidden">
           {todo.imageURL && !imgError ? (
             <>
+              {!imgLoaded && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-orange-500"></div>
+                </div>
+              )}
               <img
                 src={todo.imageURL}
                 alt={todo.title}
-                className={`w-full h-full object-cover ${imgLoaded ? '' : 'invisible'}`}
+                className={`w-full h-full object-cover ${imgLoaded ? 'block' : 'hidden'}`}
                 onLoad={() => setImgLoaded(true)}
                 onError={() => setImgError(true)}
               />
-              {!imgLoaded && (
-                <div className="absolute w-8 h-8 border-4 border-gray-300 border-t-indigo-500 rounded-full animate-spin" />
-              )}
             </>
           ) : (
             <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">

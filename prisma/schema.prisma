@@ -13,4 +13,20 @@ model Todo {
   createdAt DateTime  @default(now())
   dueDate   DateTime
   imageURL  String? 
+
+  // Tasks this task depends on
+  dependencies TaskDependency[] @relation("DependencyFrom")
+  // Tasks that depend on this task
+  dependents   TaskDependency[] @relation("DependencyTo")
+}
+
+// Join table for the many-to-many relationship
+model TaskDependency {
+  fromId Int
+  toId   Int
+
+  from   Todo @relation("DependencyFrom", fields: [fromId], references: [id])
+  to     Todo @relation("DependencyTo", fields: [toId], references: [id])
+
+  @@id([fromId, toId])
 }

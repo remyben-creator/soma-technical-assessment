@@ -56,31 +56,63 @@ Thanks for your time and effort. We'll be in touch soon!
 
 ## Solution
 ### Part 1
-The migration that I made redefines the entire Todo table to add a new column: "dueDate." What we did is add the column to schema.prism and then apply the migrations. The migration temporarily diables foreign key operations for a smooth recreation process. It copies all existing data from the old table to the new one, then renames the new table to "Todo." Finally, we re-enable the foreign key constraints and checking. These updates are found in prisma/migrations/20250717181509_add_completed_to_todo/migration.sql:
+The migration that I made redefines the entire Todo table to add a new column: "dueDate." What I did is add the column to schema.prism and then apply the migrations. The migration temporarily diables foreign key operations for a smooth recreation process. It copies all existing data from the old table to the new one, then renames the new table to "Todo." Finally, I re-enable the foreign key constraints and checking. These updates are found in prisma/migrations/20250717181509_add_completed_to_todo/migration.sql:
 <img src="screenshots/screenshot-1752778717.png" width="1000"/>
-Next we implement state management at the top of the home page file for storing the new column value. The input fields are controlled be React state, giving us real-time updates and data persistance. We then update the date input component to save the value to the state. These updates are found in app/page.tsx:
+Next I implement state management at the top of the home page file for storing the new column value. The input fields are controlled be React state, giving us real-time updates and data persistance. I then update the date input component to save the value to the state. These updates are found in app/page.tsx:
 <img src="screenshots/screenshot-1752779593.png" width="1000"/>
 <img src="screenshots/screenshot-1752778791.png" width="1000"/>
-Here we are just updating the JSON body to include the dueDate before it is sent to our backend through the HTTP POST request. We also reset the state after. These updates are found in app/page.tsx:
+Here I am just updating the JSON body to include the dueDate before it is sent to our backend through the HTTP POST request. I also reset the state after. These updates are found in app/page.tsx:
 <img src="screenshots/screenshot-1752778833.png" width="1000"/>
 Next, we update the Next.js route handler that processes requests to create new todos. I updated it to extract dueDate form the JSON, and convert dueDate to ISO for the db schema before updating the db. These updates are found in app/api/todos/route.ts:
 <img src="screenshots/screenshot-1752778745.png" width="1000"/>
 Finally, the date needs to be displayed! I updated the display to return a processed date from the db so that it is readable. It then checks with the current date, ensuring time of day does not interfere with normalization. Finally it is displayed with dynamic styling to determine if the Todo is to be late! Displaying the ISO string sliced to show down to the day! These updates can be found in app/page.tsx:
 <img src="screenshots/screenshot-1752778806.png" width="1000"/>
 
-When a todo is created, search for and display a relevant image to visualize the task to be done.
-
-To do this, make a request to the Pexels API using the task description as a search query. Display the returned image to the user within the appropriate todo item. While the image is being loaded, indicate a loading state.
-
-You will need to sign up for a free Pexels API key to make the fetch request.
 ### Part 2
-The first file defines a post api endpoint acting as a proxy to the Pexels API. The post handler defines a function to handle post requests to this endpoint. Then we extract and validate the query. Next we check for an API key and then call the Pexels API. Finally we handle the API response by extracting the Image URL and we log and respond with JSON format.
+The first file defines a post api endpoint acting as a proxy to the Pexels API. The post handler defines a function to handle post requests to this endpoint. Then I extract and validate the query. Next I check for an API key and then call the Pexels API. Finally I handle the API response by extracting the Image URL and I log and respond with JSON format.
 <img src="screenshots/screenshot-1753229877.png" width="1000"/>
 Now, when a new todo is created, the backend fetches a Pexels image and saves its URL to the database. 
 <img src="screenshots/screenshot-1753230199.png" width="1000"/>
-First similar to part 1 we make the migration to add the new column to the database table. From here we must update the code to reflect this. In the todoItem type definition we also add a imageURL field and we update the todoItem react component to display an image(if any) and handle loading state and deletion. I also had to add some logging for debugging as shown in line 17-20(to see if the component rerenders) and lines 27-34(image loading logging). Finally we reset the image state on url change. These updates can be found in app/page.tsx.
+Then, similar to part 1 I make the migration to add the new column to the database table. From here I must update the code to reflect this. In the todoItem type definition I also add a imageURL field and I update the todoItem react component to display an image(if any) and handle loading state and deletion. I also had to add some logging for debugging as shown in line 17-20(to see if the component rerenders) and lines 27-34(image loading logging). Finally I reset the image state on url change. These updates can be found in app/page.tsx.
 <img src="screenshots/screenshot-1753227708.png" width="1000"/>
-Next we have the rendering of the image in each todoItem. If imageURL exists and there is no error it attempts to show the image. While the image is loading, a spinner is shown in the UI. If the image fails to load or there is no imageURL, then a "No Image" placeholder is shown. These updates can be shown in app/page.tsx.
+Next I have the rendering of the image in each todoItem. If imageURL exists and there is no error it attempts to show the image. While the image is loading, a spinner is shown in the UI. If the image fails to load or there is no imageURL, then a "No Image" placeholder is shown. These updates can be shown in app/page.tsx.
 <img src="screenshots/screenshot-1753229013.png" width="1000"/>
+
+### Part 3
+First I need to update out prism scheme and run the migration. I write a new join table to enable self-referencing many to many relationshiop between todos. I add a column for dependencies and dependants that will hold other todos based on their relationships to the current row of todos. These updates can be found in schema.prism.
+*insert image 1 here*
+When writing the next steps for the dependencies in their route.ts file I had to clean out the stale/corrupted prisma files and regenerate them to fix the Prisma client issues after scheme changes. This got rid of linter errors in the file. First I created the GET handler to fetch dependencies and dependants for a given task, this returns two arrays respectively. I added a POST handler to add a new dependancy for a task, this will validate IDs and prevent any self-dependencies and if valid creates a new TaskDependency record and links the two tasks. A DELETE handler was added to remove dependencies as well. Finally I added a circular dependency prevention function that will check if when adding a dependency if the inverse already exists. I use a DFS to traverse the dependency graph and if it detects a cycle it returns true. All of these changes can be found in api/[id]/dependecies.
+*insert images 2 and 3 here*
+Next I needed to show the critical path and calculate the earliest start date. I make a new route.ts file for this. I start by defining the TypeScript types for safety and clarity in the code. I then built a function that constructs an in memory graph representation of all tasks and their dependencies where each node contains the todo, a list of dependencies, and a list of dependantss. I then use Kahn's algorithm to perform a topological sort of the nodes(tasks) in the dependency graph, this ensures tasks are processed in dependancy order. Then for each task I calculate the longest path from any root to the task. I track these results in a Map for efficient lookup, mapping task IDs to the earliest start dates and then find the critical path. Finally, a GET handler is added to build the dependency graph and perform the sort, then it returns a JSON response containing the criticalPath and earliestStartDates. These changes can be found in api/[id]/critical-path/route.ts
+*insert images 4 6 7 here*
+
+6. Visualize the Dependency Graph
+Frontend:
+Use a graph visualization library (e.g., react-flow, Cytoscape.js, or Mermaid.js).
+Show tasks as nodes, dependencies as arrows.
+Highlight the critical path.
+7. UI Changes
+Allow users to:
+Add/remove dependencies when creating or editing a task.
+View dependencies and dependents for each task.
+See the dependency graph and critical path.
+8. Migration
+Update your database schema and migrate existing data.
+Summary Table
+Step	What to Do
+1	Update Prisma schema for self-referencing dependencies
+2	Add API endpoints for managing dependencies
+3	Implement cycle detection logic in backend
+4	Implement critical path calculation (backend or frontend)
+5	Calculate earliest start dates for each task
+6	Add graph visualization to frontend
+7	Update UI for dependency management and visualization
+8	Migrate database and test
+Would you like a detailed plan or code examples for any of these steps?
+For example, I can:
+Write the Prisma schema update
+Show how to check for cycles
+Suggest a graph visualization approach
+Or help with any specific part you want to tackle first!
 
 
