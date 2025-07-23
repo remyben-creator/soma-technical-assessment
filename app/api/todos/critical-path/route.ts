@@ -124,12 +124,18 @@ function analyzeGraph(graph: Graph, order: number[]) {
 
 export async function GET() {
   try {
-    const todos = await prisma.todo.findMany();
+    const todosRaw = await prisma.todo.findMany();
     const dependencies = await prisma.taskDependency.findMany();
 
-    if (todos.length === 0) {
+    if (todosRaw.length === 0) {
       return NextResponse.json({ criticalPath: [], earliestStartDates: {} });
     }
+
+    const todos: Todo[] = todosRaw.map(todo => ({
+      ...todo,
+      createdAt: todo.createdAt instanceof Date ? todo.createdAt.toISOString() : todo.createdAt,
+      dueDate: todo.dueDate instanceof Date ? todo.dueDate.toISOString() : todo.dueDate,
+    }));
 
     const graph = buildGraph(todos, dependencies);
     console.log('Graph:', Array.from(graph.entries()));

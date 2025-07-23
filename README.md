@@ -80,13 +80,26 @@ Next I have the rendering of the image in each todoItem. If imageURL exists and 
 
 ### Part 3
 First I need to update out prism scheme and run the migration. I write a new join table to enable self-referencing many to many relationshiop between todos. I add a column for dependencies and dependants that will hold other todos based on their relationships to the current row of todos. These updates can be found in schema.prism.
-*insert image 1 here*
-When writing the next steps for the dependencies in their route.ts file I had to clean out the stale/corrupted prisma files and regenerate them to fix the Prisma client issues after scheme changes. This got rid of linter errors in the file. First I created the GET handler to fetch dependencies and dependants for a given task, this returns two arrays respectively. I added a POST handler to add a new dependancy for a task, this will validate IDs and prevent any self-dependencies and if valid creates a new TaskDependency record and links the two tasks. A DELETE handler was added to remove dependencies as well. Finally I added a circular dependency prevention function that will check if when adding a dependency if the inverse already exists. I use a DFS to traverse the dependency graph and if it detects a cycle it returns true. All of these changes can be found in api/[id]/dependecies.
-*insert images 2 and 3 here*
-Next I needed to show the critical path and calculate the earliest start date. I make a new route.ts file for this. I start by defining the TypeScript types for safety and clarity in the code. I then built a function that constructs an in memory graph representation of all tasks and their dependencies where each node contains the todo, a list of dependencies, and a list of dependantss. I then use Kahn's algorithm to perform a topological sort of the nodes(tasks) in the dependency graph, this ensures tasks are processed in dependancy order. Then for each task I calculate the longest path from any root to the task. I track these results in a Map for efficient lookup, mapping task IDs to the earliest start dates and then find the critical path. Finally, a GET handler is added to build the dependency graph and perform the sort, then it returns a JSON response containing the criticalPath and earliestStartDates. These changes can be found in api/[id]/critical-path/route.ts
-*insert images 4 6 7 here*
 
-
+<img src="screenshots/screenshot-1753299002.png" width="1000"/>
+When writing the next steps for the dependencies in their route.ts file I had to clean out the stale/corrupted prisma files and regenerate them to fix the Prisma client issues after scheme changes. This got rid of linter errors in the file. First I created the GET handler to fetch dependencies and dependants for a given task, this returns two arrays respectively. I added a POST handler to add a new dependancy for a task, this will validate IDs and prevent any self-dependencies and if valid creates a new TaskDependency record and links the two tasks. A DELETE handler was added to remove dependencies as well. Finally I added a circular dependency prevention function that will check if when adding a dependency if the inverse already exists. I use a DFS to traverse the dependency graph and if it detects a cycle it returns true. All of these changes can be found in app/api/[id]/dependecies.
+<img src="screenshots/screenshot-1753299340.png" width="1000"/>
+<img src="screenshots/screenshot-1753299349.png" width="1000"/>
+Next I needed to show the critical path and calculate the earliest start date. I make a new route.ts file for this. I start by defining the TypeScript types for safety and clarity in the code. I then built a function that constructs an in memory graph representation of all tasks and their dependencies where each node contains the todo, a list of dependencies, and a list of dependantss. I then use Kahn's algorithm to perform a topological sort of the nodes(tasks) in the dependency graph, this ensures tasks are processed in dependancy order. Then for each task I calculate the longest path from any root to the task. I track these results in a Map for efficient lookup, mapping task IDs to the earliest start dates and then find the critical path. Finally, a GET handler is added to build the dependency graph and perform the sort, then it returns a JSON response containing the criticalPath and earliestStartDates. These changes can be found in app/api/[id]/critical-path/route.ts
+<img src="screenshots/screenshot-1753299236.png" width="1000"/>
+<img src="screenshots/screenshot-1753299250.png" width="1000"/>
+<img src="screenshots/screenshot-1753299262.png" width="1000"/>
+Now I needed to update the page.tsx for displaying these new features! For clean and readable code I have defined different component files in the components folder.
+First is the todo item component. It has states and effects to handle image loading state and provides buttons for editing dependencies. These edits can be found in app/components/TodoItem.tsx.
+<img src="screenshots/screenshot-1753298684.png" width="1000"/>
+<img src="screenshots/screenshot-1753298696.png" width="1000"/>
+Now the dependency modal. This component displays a modal dialogue for editing the dependencies of a todoItem. The user is given the option to choose if they want to add or delete a dependency. When delete is chosen, the current dependencies will be shown to select from. These edits can be found in app/components/DependencyModal.tsx.
+<img src="screenshots/screenshot-1753298624.png" width="1000"/>
+<img src="screenshots/screenshot-1753298637.png" width="1000"/>
+Finally the dependency graph. This component displays a graph that vizualizes all todos and their dependencies using react flow. It calculates a grid layout for nodes based on how many todos there are and from there maps each dependency with a directed and animated edge. These edits can be found in app/components/DependencyGraph.tsx. The dependencies from the graph are pulled with app/api/todos/dependencies/route.ts.
+screenshots/screenshot-1753299002.png
+<img src="screenshots/screenshot-1753298659.png" width="1000"/>
+Finally finally finally, here is the updated page.tsx that holds all of these components.
 ### Application screenshots
 <img src="screenshots/screenshot-1753291624.png" width="1000"/>
 <img src="screenshots/screenshot-1753291637.png" width="1000"/>
