@@ -116,3 +116,11 @@ Suggest a graph visualization approach
 Or help with any specific part you want to tackle first!
 
 
+### Application screenshots
+<img src="screenshots/screenshot-1753291624.png" width="1000"/>
+<img src="screenshots/screenshot-1753291637.png" width="1000"/>
+<img src="screenshots/screenshot-1753291651.png" width="1000"/>
+<img src="screenshots/screenshot-1753291663.png" width="1000"/>
+<img src="screenshots/screenshot-1753291674.png" width="1000"/>
+
+
