@@ -96,11 +96,15 @@ First is the todo item component. It has states and effects to handle image load
 Now the dependency modal. This component displays a modal dialogue for editing the dependencies of a todoItem. The user is given the option to choose if they want to add or delete a dependency. When delete is chosen, the current dependencies will be shown to select from. These edits can be found in app/components/DependencyModal.tsx.
 <img src="screenshots/screenshot-1753298624.png" width="1000"/>
 <img src="screenshots/screenshot-1753298637.png" width="1000"/>
-Finally the dependency graph. This component displays a graph that vizualizes all todos and their dependencies using react flow. It calculates a grid layout for nodes based on how many todos there are and from there maps each dependency with a directed and animated edge. These edits can be found in app/components/DependencyGraph.tsx. The dependencies from the graph are pulled with app/api/todos/dependencies/route.ts.
-screenshots/screenshot-1753299002.png
+Now the dependency graph. This component displays a graph that vizualizes all todos and their dependencies using react flow. It calculates a grid layout for nodes based on how many todos there are and from there maps each dependency with a directed and animated edge. These edits can be found in app/components/DependencyGraph.tsx. The dependencies from the graph are pulled with app/api/todos/dependencies/route.ts.
 <img src="screenshots/screenshot-1753298659.png" width="1000"/>
-Finally finally finally, here is the updated page.tsx that holds all of these components.
-### Application screenshots
+Finally finally finally, here is the updated page.tsx that holds all of these components. And the associated handlers for the frontend.
+<img src="screenshots/screenshot-1753364617.png" width="1000"/>
+<img src="screenshots/screenshot-1753364629.png" width="1000"/>
+<img src="screenshots/screenshot-1753364665.png" width="1000"/>
+<img src="screenshots/screenshot-1753364674.png" width="1000"/>
+
+### Application Screenshots
 <img src="screenshots/screenshot-1753291624.png" width="1000"/>
 <img src="screenshots/screenshot-1753291637.png" width="1000"/>
 <img src="screenshots/screenshot-1753291651.png" width="1000"/>
